@@ -11,9 +11,12 @@ import {
   TransactionInstruction,
 } from "@solana/web3.js";
 import BN from "bn.js";
+import fs from "fs";
+import os from "os";
 
+const keyPairPath = os.homedir() + "/.config/solana/id.json";
 // TODO
-const manager_private_key = [];
+const manager_private_key = JSON.parse(fs.readFileSync(keyPairPath, "utf-8"));
 
 const managerAccount = new Account(manager_private_key);
 
@@ -125,7 +128,7 @@ export async function initPool(
 
   // return { transaction, newPoolAccount };
 
-  await sendAndConfirmTransaction(
+  const tx = await sendAndConfirmTransaction(
     connection,
     transaction,
     [managerAccount, newPoolAccount],
@@ -135,6 +138,7 @@ export async function initPool(
       preflightCommitment: "recent",
     }
   );
+  console.log(`Tx: https://explorer.solana.com/tx/${tx}?cluster=devnet`);
 }
 
 class PoolInfo {
@@ -262,7 +266,7 @@ export async function buy(pool_id: string, buyer: Account) {
   );
 
   // return { transaction, newTicketAccount };
-  await sendAndConfirmTransaction(
+  const tx = await sendAndConfirmTransaction(
     connection,
     transaction,
     [buyer, newTicketAccount],
@@ -272,6 +276,7 @@ export async function buy(pool_id: string, buyer: Account) {
       preflightCommitment: "recent",
     }
   );
+  console.log(`Tx: https://explorer.solana.com/tx/${tx}?cluster=devnet`);
 }
 
 // I'm the pool manager, so fill in my own public key
